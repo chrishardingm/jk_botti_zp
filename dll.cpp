@@ -72,6 +72,9 @@ int bot_chat_tag_percent = 80;   // percent of the time to drop clan tag
 int bot_chat_drop_percent = 10;  // percent of the time to drop characters
 int bot_chat_swap_percent = 10;  // percent of the time to swap characters
 int bot_chat_lower_percent = 50; // percent of the time to lowercase chat
+int bot_volunteer_zombie = 1; // Bots will volunteer to join zombies by default
+int zombie_handicap = 25; // Zombie Bots will only attack 50% of the time
+
 
 int team_balancetype = 1;
 char *team_blockedlist;
@@ -153,7 +156,7 @@ static int CheckSubMod(void)
    default:
       submod = SUBMOD_HLDM;
    case SUBMOD_HLDM:
-      UTIL_ConsolePrintf("Standard HL1DM assumed.");
+      UTIL_ConsolePrintf("Standard HL1DM modified for ZP.");
       break;
    }
    

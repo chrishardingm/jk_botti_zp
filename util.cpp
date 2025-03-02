@@ -754,6 +754,11 @@ char * UTIL_GetTeam(edict_t *pEntity, char *teamstr, size_t slen)
    
    return(teamstr);
 }
+// ZP teams are 1-4 based
+int UTIL_GetTeamNum(edict_t *pEntity)
+{
+   return pEntity->v.team - 1;
+}
 
 qboolean FVisible( const Vector &vecOrigin, edict_t *pEdict, edict_t ** pHit )
 {
@@ -910,7 +915,8 @@ void UTIL_SelectWeapon(edict_t *pEdict, int weapon_index)
 
 void UTIL_BuildFileName_N(char *filename, int size, char *arg1, char *arg2)
 {
-   const char * mod_dir = (submod_id == SUBMOD_OP4) ? "gearbox" : "valve";
+   //zp directory is used instead of valve
+   const char * mod_dir = (submod_id == SUBMOD_OP4) ? "gearbox" : "zp";
    
    if ((arg1 != NULL) && (arg2 != NULL))
    {

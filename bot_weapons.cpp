@@ -117,11 +117,11 @@ bot_weapon_select_t valve_weapon_select[NUM_OF_WEAPON_SELECTS] =
     60, FALSE, 100, 1, 0, TRUE, FALSE, FALSE, FALSE, 0.0, 0.0, FALSE, 75, -1,
     W_IFL_M249, W_IFL_AMMO_556, 0, TRUE, FALSE },
    
-   {GEARBOX_WEAPON_DISPLACER, WEAPON_SUBMOD_OP4, "weapon_displacer", WEAPON_FIRE_AT_FEET, 1.0,
-    SKILL2, NOSKILL, FALSE, FALSE,
-    400.0, 1200.0, 0.0, 0.0, 450.0,
-    30, FALSE, 100, 100, 0, FALSE, FALSE, FALSE, FALSE, 0.0, 0.0, FALSE, 100, -1,
-    W_IFL_DISPLACER, W_IFL_AMMO_GAUSS, 0, TRUE, FALSE },
+   {GEARBOX_WEAPON_DISPLACER, WEAPON_SUBMOD_OP4, "weapon_swipe", WEAPON_MELEE, 1.0,
+    NOSKILL, NOSKILL, FALSE, FALSE,
+    0.0, 40.0, 0, 0, 1.0,
+    20, TRUE, 100, 0, 0, FALSE, FALSE, FALSE, FALSE, 0.0, 0.0, FALSE, -1, -1,
+    W_IFL_DISPLACER, 0, 0, TRUE, FALSE },
    
    {GEARBOX_WEAPON_SHOCKRIFLE, WEAPON_SUBMOD_OP4, "weapon_shockrifle", WEAPON_FIRE, 1.0,
     SKILL5, NOSKILL, FALSE, FALSE,
@@ -270,13 +270,13 @@ bot_fire_delay_t fire_delay[NUM_OF_WEAPON_SELECTS];
 bot_weapon_select_t weapon_select[NUM_OF_WEAPON_SELECTS];
 
 
-//
+// ZP is using OP4 weapons to allow zombies to attack.
 int SubmodToSubmodWeaponFlag(int submod)
 {
    switch(submod)
    {
       default:
-      case(SUBMOD_HLDM):      return(WEAPON_SUBMOD_HLDM);
+      case(SUBMOD_HLDM):      return(WEAPON_SUBMOD_OP4);
       case(SUBMOD_SEVS):      return(WEAPON_SUBMOD_SEVS);
       case(SUBMOD_BUBBLEMOD): return(WEAPON_SUBMOD_BUBBLEMOD);
       case(SUBMOD_XDM):       return(WEAPON_SUBMOD_XDM);

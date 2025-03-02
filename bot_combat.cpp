@@ -31,6 +31,7 @@ extern qboolean is_team_play;
 extern qboolean checked_teamplay;
 extern int num_logos;
 extern int submod_id;
+extern int zombie_handicap;
 extern qboolean b_botdontshoot;
 
 char g_team_list[TEAMPLAY_TEAMLISTLENGTH];
@@ -594,10 +595,11 @@ qboolean AreTeamMates(edict_t * pOther, edict_t * pEdict)
    // is team play enabled?
    if (is_team_play)
    {
-      char other_model[MAX_TEAMNAME_LENGTH];
-      char edict_model[MAX_TEAMNAME_LENGTH];
-      
-      return(!stricmp(UTIL_GetTeam(pOther, other_model, sizeof(other_model)), UTIL_GetTeam(pEdict, edict_model, sizeof(edict_model))));
+      int teamOther = UTIL_GetTeamNum(pOther);
+      int teamEdict = UTIL_GetTeamNum(pEdict);
+      if (teamOther == teamEdict) {
+         return true;  // Are Team mates
+      }
    }
    
    return FALSE;
@@ -1177,7 +1179,13 @@ static qboolean CheckWeaponFireConditions(bot_t & pBot, const bot_weapon_select_
 {
    edict_t *pEdict = pBot.pEdict;
    
-   //
+   // Check if bot is on the zombie team.
+   // Use Zombie_skill to determine attack perctange.
+   int teamEdict = UTIL_GetTeamNum(pEdict);
+   if (RANDOM_LONG2(1, 100) <= zombie_handicap && teamEdict == 1){
+      return FALSE;
+   }
+   
    if ((select.type & WEAPON_MELEE) == WEAPON_MELEE)
    {
       // check if bot needs to duck down to hit enemy...

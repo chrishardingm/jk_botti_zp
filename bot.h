@@ -150,6 +150,7 @@ typedef struct
    
    edict_t *pEdict;
    qboolean need_to_initialize;
+   qboolean not_started;
    
    char name[BOT_NAME_LEN];
    char skin[BOT_SKIN_LEN];

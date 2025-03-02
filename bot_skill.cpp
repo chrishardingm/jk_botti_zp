@@ -110,7 +110,7 @@ bot_skill_settings_t default_skill_settings[5] = {
 //16:
      0.060, 0.03, 2.0, 
 //19:
-     TRUE, 50, 75, 50, 100,
+     TRUE, 35, 60, 50, 100,
 //24:
      //TRUE, 100, 100, 1000.0, 400.0, 20.0, 1000.0,
      //TRUE, 99,
@@ -132,7 +132,7 @@ bot_skill_settings_t default_skill_settings[5] = {
 //16:
      0.120, 0.04, 3.0, 
 //19:
-     TRUE, 35, 60, 35, 90,
+     TRUE, 20, 40, 35, 90,
 //24:
      //TRUE, 50, 50, 1000.0, 400.0, 10.0, 1000.0,
      //TRUE, 66,
@@ -154,7 +154,7 @@ bot_skill_settings_t default_skill_settings[5] = {
 //16:
      0.180, 0.05, 4.0, 
 //19:
-     TRUE, 20, 40, 20, 70,
+     TRUE, 10, 25, 20, 70,
 //24:
      //TRUE, 20, 20, 1000.0, 400.0, 10.0, 1000.0,
      //TRUE, 33,
@@ -176,7 +176,7 @@ bot_skill_settings_t default_skill_settings[5] = {
 //16:
      0.240, 0.075, 6.0, 
 //19:
-     TRUE, 10, 25, 10, 40,
+     TRUE, 5, 15, 10, 40,
 //24:
      //TRUE, 0, 0, 0.0, 0.0, 0.0, 0.0,
      //FALSE, 0,
@@ -198,7 +198,7 @@ bot_skill_settings_t default_skill_settings[5] = {
 //16:
      0.300, 0.10, 8.0, 
 //19:
-     FALSE, 5, 15, 5, 0,
+     FALSE, 1, 5, 5, 0,
 //24:
      //FALSE, 0, 0, 0.0, 0.0, 0.0, 0.0,
      //FALSE, 0,

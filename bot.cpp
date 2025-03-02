@@ -39,6 +39,8 @@ extern int bot_chat_tag_percent;
 extern int bot_chat_drop_percent;
 extern int bot_chat_swap_percent;
 extern int bot_chat_lower_percent;
+extern int bot_volunteer_zombie;
+extern int zombie_handicap;
 extern qboolean b_random_color;
 extern qboolean debug_minmax;
 
@@ -580,45 +582,10 @@ static void RecountTeams(void)
 //
 void BotCheckTeamplay(void)
 {
-   float f_team_play = CVAR_GET_FLOAT("mp_teamplay");  // teamplay enabled?
-
-   if (f_team_play > 0.0f)
-      is_team_play = TRUE;
-   else
-      is_team_play = FALSE;
-
+   //Zombie panic is always team play and does not use mp_teamplay
+   is_team_play = TRUE;
    checked_teamplay = TRUE;
-   
-   // get team list, exactly as in teamplay_gamerules.cpp
-   if(is_team_play)
-   {
-      safe_strcopy(g_team_list, sizeof(g_team_list), CVAR_GET_STRING("mp_teamlist"));
-      
-      edict_t *pWorld = INDEXENT(0);
-      if ( pWorld && pWorld->v.team )
-      {
-         if ( CVAR_GET_FLOAT("mp_teamoverride") != 0.0f )
-         {
-            const char *pTeamList = STRING(pWorld->v.team);
-            if ( pTeamList && *pTeamList )
-            {
-               safe_strcopy(g_team_list, sizeof(g_team_list), pTeamList);
-            }
-         }
-      }
-      
-      // Has the server set teams
-      g_team_limit = ( *g_team_list != 0 );
-      
-      RecountTeams();
-   }
-   else
-   {
-      g_team_list[0] = 0;
-      g_team_limit = FALSE;
-      
-      memset(g_team_names, 0, sizeof(g_team_names));
-   }
+
 }
 
 
@@ -891,6 +858,7 @@ void BotCreate( const char *skin, const char *name, int skill, int top_color, in
       BotSpawnInit(pBot);
 
       pBot.need_to_initialize = FALSE;  // don't need to initialize yet
+      pBot.not_started = TRUE; 
 
       BotEnt->v.idealpitch = BotEnt->v.v_angle.x;
       BotEnt->v.ideal_yaw = BotEnt->v.v_angle.y;
@@ -2505,18 +2473,18 @@ static void BotDoRandomJumpingAndDuckingAndLongJumping(bot_t &pBot, float moved_
 
 static void BotRunPlayerMove(bot_t &pBot, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, byte msec)
 {
-   /*
-      Calling sequence after calling g_engfuncs.pfnRunPlayerMove:
-      
-         1. CmdStart
-         2. PlayerPreThink
-         3. PM_Move
-         4. PlayerPostThink
-         5. CmdEnd
-   */
-   BotAimPre(pBot);
-   g_engfuncs.pfnRunPlayerMove( pBot.pEdict, viewangles, forwardmove, sidemove, upmove, buttons, impulse, msec);
-   BotAimPost(pBot);
+  /*
+     Calling sequence after calling g_engfuncs.pfnRunPlayerMove:
+     
+        1. CmdStart
+        2. PlayerPreThink
+        3. PM_Move
+        4. PlayerPostThink
+        5. CmdEnd
+  */
+  BotAimPre(pBot);
+  g_engfuncs.pfnRunPlayerMove( pBot.pEdict, viewangles, forwardmove, sidemove, upmove, buttons, impulse, msec);
+  BotAimPost(pBot);
 }
 
 
@@ -2604,6 +2572,15 @@ void BotThink( bot_t &pBot )
 
    BotUpdateHearingSensitivity(pBot);
 
+   // For some reason Zombie panic needs pfnRunPlayerMove to be ran once before starting a round.
+   if (pBot.not_started)
+   {
+       g_engfuncs.pfnRunPlayerMove(pEdict, pEdict->v.v_angle, pBot.f_move_speed,
+           0, 0, pEdict->v.button, 0, pBot.msecval);
+       pBot.not_started = FALSE;
+       return;
+   }
+
    // does bot need to say a message and time to say a message?
    if (false && (pBot.b_bot_say) && (pBot.f_bot_say < gpGlobals->time))
    {
@@ -2650,6 +2627,13 @@ void BotThink( bot_t &pBot )
    // random chatting
    BotChatTalk(pBot);
 
+   // Have bot join team
+   if(bot_volunteer_zombie){
+      FakeClientCommand(pEdict, "jointeam", "2", NULL);
+   }else {
+      UTIL_ConsolePrintf("joining Humans");
+      FakeClientCommand(pEdict, "jointeam", "1", NULL);
+   }
    // set this for the next time the bot dies so it will initialize stuff
    if (pBot.need_to_initialize == FALSE)
    {

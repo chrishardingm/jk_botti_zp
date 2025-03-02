@@ -67,6 +67,8 @@ extern int bot_chat_tag_percent;
 extern int bot_chat_drop_percent;
 extern int bot_chat_swap_percent;
 extern int bot_chat_lower_percent;
+extern int bot_volunteer_zombie;
+extern int zombie_handicap;
 extern qboolean b_random_color;
 
 qboolean isFakeClientCommand = FALSE;
@@ -405,6 +407,35 @@ static qboolean ProcessCommand(const int cmdtype, const printfunc_t printfunc, v
       }
 
       safevoid_snprintf(msg, sizeof(msg), "bot_add_level_tag is %s\n", (bot_add_level_tag?"on":"off"));
+      printfunc(PRINTFUNC_INFO, arg, msg);
+
+      return TRUE;
+   }
+   else if (FStrEq(pcmd, "bot_volunteer_zombie"))
+   {
+      if ((arg1 != NULL) && (*arg1 != 0))
+      {
+         int temp = atoi(arg1);
+         if (temp)
+            bot_volunteer_zombie = 1;
+         else
+            bot_volunteer_zombie = 0;
+      }
+      return TRUE;
+   }
+   else if (FStrEq(pcmd, "zombie_handicap"))
+   {
+      if ((arg1 != NULL) && (*arg1 != 0))
+      {
+         int temp = atoi(arg1);
+
+         if ((temp < 0) || (temp > 100))
+            printfunc(PRINTFUNC_ERROR, arg, "invalid zombie_handicap value!\n");
+         else
+         zombie_handicap = temp;
+      }
+
+      safevoid_snprintf(msg, sizeof(msg), "zombie_handicap is %d\n", zombie_handicap);
       printfunc(PRINTFUNC_INFO, arg, msg);
 
       return TRUE;
