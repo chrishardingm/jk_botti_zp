@@ -2631,7 +2631,6 @@ void BotThink( bot_t &pBot )
    if(bot_volunteer_zombie){
       FakeClientCommand(pEdict, "jointeam", "2", NULL);
    }else {
-      UTIL_ConsolePrintf("joining Humans");
       FakeClientCommand(pEdict, "jointeam", "1", NULL);
    }
    // set this for the next time the bot dies so it will initialize stuff
