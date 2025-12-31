@@ -162,19 +162,6 @@ void BotAimPost( bot_t &pBot )
       pBot.f_special_shoot_angle = 0.0;
    }
    
-   // special case for m249
-   if(pBot.current_weapon.iId == GEARBOX_WEAPON_M249)
-   {
-      if((pBot.pEdict->v.flags & FL_DUCKING) == FL_DUCKING)
-         pBot.f_recoil /= 4;
-   }
-   // special case for eagle
-   else if(pBot.current_weapon.iId == GEARBOX_WEAPON_EAGLE)
-   {
-      if(pBot.eagle_secondary_state != 0)
-         pBot.f_recoil /= 15;
-   }
-   
    // add any recoil left to punch angle now
    pBot.pEdict->v.punchangle.x += pBot.f_recoil;
    
@@ -878,7 +865,7 @@ void BotFindEnemy( bot_t &pBot )
 
    pNewEnemy = NULL;
    v_newenemy = Vector(0,0,0);
-   nearestdistance = 99999;
+   nearestdistance = 50;
 
    if (pNewEnemy == NULL)
    {
@@ -902,8 +889,8 @@ void BotFindEnemy( bot_t &pBot )
             pBreakable->pEdict->v.health <= 0)
             continue;
 
-         if (pBreakable->pEdict->v.health > 8000)
-	    continue; // skip breakables with large health
+         if (pBreakable->pEdict->v.health > 100)
+	         continue; // skip breakables with large health
          
          Vector v_origin = UTIL_GetOriginWithExtent(pBot, pBreakable->pEdict);
 
@@ -1243,15 +1230,8 @@ static qboolean BotFireSelectedWeapon(bot_t & pBot, const bot_weapon_select_t &s
    if(use_primary && (select.type & WEAPON_FIRE_ZOOM) == WEAPON_FIRE_ZOOM && pEdict->v.fov == 0)
       use_primary = !(use_secondary = TRUE);
    
-   // use secondary once to enable aimspot
-   if(use_primary && select.iId == GEARBOX_WEAPON_EAGLE && pBot.eagle_secondary_state == 0)
-   {
-      use_primary = !(use_secondary = TRUE);
-      pBot.eagle_secondary_state = 1;
-   }
-   
    //duck for better aim
-   if(select.iId == GEARBOX_WEAPON_M249)
+   if(select.iId == VALVE_WEAPON_SIG)
    {
       pBot.f_duck_time = gpGlobals->time + 0.5f;
       pEdict->v.button |= IN_DUCK;
@@ -1863,37 +1843,6 @@ void BotShootAtEnemy( bot_t &pBot )
          BotResetReactionTime(pBot);
       }
    }
-}
-
-
-qboolean BotShootTripmine( bot_t &pBot )
-{
-   edict_t *pEdict = pBot.pEdict;
-   qboolean ret;
-
-   if (!pBot.b_shoot_tripmine)
-     return FALSE;
-   if (FNullEnt(pBot.tripmine_edict))
-     return FALSE;
-
-   // Shoot tripmine only if bot does not have target
-   if (pBot.pBotEnemy != NULL)
-     return FALSE;
-
-   // aim at the tripmine and fire the glock...
-   Vector v_enemy = pBot.v_tripmine - GetGunPosition( pEdict );
-   Vector enemy_angle = UTIL_VecToAngles(v_enemy);
-
-   pEdict->v.idealpitch = UTIL_WrapAngle(enemy_angle.x);
-   pEdict->v.ideal_yaw = UTIL_WrapAngle(enemy_angle.y);
-
-   //TODO: check if glock is available!!!!
-   // if not try find another weapon which can do this (type: WEAPON_FIRE or FIRE_ZOOM).
-   //TODO: or maybe throw grenade????
-   pBot.pBotEnemy = pBot.tripmine_edict;
-   ret = BotFireWeapon( v_enemy, pBot, VALVE_WEAPON_GLOCK );
-   pBot.pBotEnemy = NULL;
-   return ret;
 }
 
 void BotThrowSatchel(bot_t& pBot) {

@@ -684,7 +684,7 @@ static void BotFindWaypointGoal( bot_t &pBot )
    }
    
    //HACK
-   if(index == -1 && (pBot.satchel_state == SAT_NONE && BotIsCarryingWeapon(pBot, VALVE_WEAPON_SATCHEL))) {
+   if(index == -1 && (pBot.satchel_state == SAT_NONE && BotIsCarryingWeapon(pBot, VALVE_WEAPON_IED))) {
        edict_t* bombTarget = NULL;
        bombTarget = UTIL_FindEntityByClassname(bombTarget, "func_bomb_target");
        if(RANDOM_LONG2(0, 1))

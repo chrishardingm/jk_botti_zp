@@ -227,7 +227,6 @@ static int Spawn( edict_t *pent )
          PRECACHE_SOUND("player/sprayer.wav");         // logo spray sound
 
          m_spriteTexture = PRECACHE_MODEL( "sprites/lgtning.spr");
-         PRECACHE_MODEL( "models/w_chainammo.mdl");
 
          g_in_intermission = FALSE;
 

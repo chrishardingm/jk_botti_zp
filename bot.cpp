@@ -2627,11 +2627,20 @@ void BotThink( bot_t &pBot )
    // random chatting
    BotChatTalk(pBot);
 
-   // Have bot join team
-   if(bot_volunteer_zombie){
-      FakeClientCommand(pEdict, "jointeam", "2", NULL);
-   }else {
-      FakeClientCommand(pEdict, "jointeam", "1", NULL);
+   // Have bot join a team
+   int teamEdict = UTIL_GetTeamNum(pEdict);
+   //Team 0 is before the bot has a team in the new ZP!
+   //Team 4 is before the bot has a team in the old ZP!
+   if(teamEdict == 0 || teamEdict == 4){
+      //Jointeam is the command for the old ZP!
+      //Joingame is the command for the new ZP!
+      if(bot_volunteer_zombie){
+         FakeClientCommand(pEdict, "jointeam", "2", NULL);
+         FakeClientCommand(pEdict, "joingame", "volunteer", NULL);
+      }else {
+         FakeClientCommand(pEdict, "jointeam", "1", NULL);
+         FakeClientCommand(pEdict, "joingame", "", NULL);
+      }
    }
    // set this for the next time the bot dies so it will initialize stuff
    if (pBot.need_to_initialize == FALSE)
@@ -2721,16 +2730,6 @@ void BotThink( bot_t &pBot )
             !(pEdict->v.button & (IN_ATTACK|IN_ATTACK2)))
          {
             pEdict->v.button |= IN_ATTACK2;
-         }
-         
-         // if has aim spot weapon and have spot on, click spot off
-         if(pBot.current_weapon_index != -1 && 
-            weapon_select[pBot.current_weapon_index].iId == GEARBOX_WEAPON_EAGLE &&
-            pBot.eagle_secondary_state != 0 &&
-            !(pEdict->v.button & (IN_ATTACK|IN_ATTACK2)))
-         {
-            pEdict->v.button |= IN_ATTACK2;
-            pBot.eagle_secondary_state = 0;
          }
       }
    }

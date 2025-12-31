@@ -37,60 +37,62 @@ bot_weapon_t weapon_defs[MAX_WEAPONS]; // array of weapon definitions
 
 // This message is sent when a client joins the game.  All of the weapons
 // are sent with the weapon ID and information about what ammo is used.
-void BotClient_Valve_WeaponList(void *p, int bot_index)
+void BotClient_Valve_WeaponList(void* p, int bot_index)
 {
-   static int state = 0;   // current state machine state
-   static bot_weapon_t bot_weapon;
+    static int state = 0;
+    static bot_weapon_t bot_weapon;
 
-   if (state == 0)
-   {
-      state++;
-      safe_strcopy(bot_weapon.szClassname, sizeof(bot_weapon.szClassname), (char *)p);
-   }
-   else if (state == 1)
-   {
-      state++;
-      bot_weapon.iAmmo1 = *(int *)p;  // ammo index 1
-   }
-   else if (state == 2)
-   {
-      state++;
-      bot_weapon.iAmmo1Max = *(int *)p;  // max ammo1
-   }
-   else if (state == 3)
-   {
-      state++;
-      bot_weapon.iAmmo2 = *(int *)p;  // ammo index 2
-   }
-   else if (state == 4)
-   {
-      state++;
-      bot_weapon.iAmmo2Max = *(int *)p;  // max ammo2
-   }
-   else if (state == 5)
-   {
-      state++;
-      bot_weapon.iSlot = *(int *)p;  // slot for this weapon
-   }
-   else if (state == 6)
-   {
-      state++;
-      bot_weapon.iPosition = *(int *)p;  // position in slot
-   }
-   else if (state == 7)
-   {
-      state++;
-      bot_weapon.iId = *(int *)p;  // weapon ID
-   }
-   else if (state == 8)
-   {
-      state = 0;
+    switch (state)
+    {
+    case 0: /* classname */
+    {
+        const char* name = (const char*)p;
 
-      bot_weapon.iFlags = *(int *)p;  // flags for weapon (WTF???)
+        safe_strcopy(bot_weapon.szClassname,
+            sizeof(bot_weapon.szClassname),
+            name);
 
-      // store away this weapon with it's ammo information...
-      weapon_defs[bot_weapon.iId] = bot_weapon;
-   }
+        state = 1;
+        break;
+    }
+
+    case 1:
+        bot_weapon.iAmmo1 = *(byte*)p;
+        state = 2;
+        break;
+
+    case 2:
+        bot_weapon.iAmmo2 = *(byte*)p;
+        state = 3;
+        break;
+
+    case 3:
+        bot_weapon.iSlot = *(byte*)p;
+        state = 4;
+        break;
+
+    case 4:
+        bot_weapon.iId = *(byte*)p;
+        state = 5;
+        break;
+
+    case 5:
+        bot_weapon.iFlags = *(byte*)p;
+
+        state = 6;
+        break;
+    case 6:
+        bot_weapon.iWeight = *(byte*)p;
+        state = 7;
+        break;
+
+    case 7:
+        bot_weapon.bDoubleSlot = *(byte*)p;
+        weapon_defs[bot_weapon.iId] = bot_weapon;
+
+        state = 0;
+        break;
+    }
 }
 
 

@@ -2239,10 +2239,6 @@ static void WaypointAutowaypointing(int idx, edict_t *pEntity)
    // on moving platform or train?
    if(!FNullEnt(pEntity->v.groundentity) && (pEntity->v.groundentity->v.speed > 0.0f || pEntity->v.groundentity->v.avelocity != Vector(0, 0, 0)))
       return;
-   
-   // moving with grapple (op4)
-   if(pEntity->v.movetype == MOVETYPE_FLY && players[idx].current_weapon_id == GEARBOX_WEAPON_GRAPPLE)
-      return;
 
    // more waypoints on ladders
    float target_distance = (pEntity->v.movetype == MOVETYPE_FLY) ? 65.0f : 200.0f;

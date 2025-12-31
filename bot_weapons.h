@@ -73,7 +73,7 @@ typedef struct
 {
    int iId;  // the weapon ID value
    int supported_submods; // supported submods
-   char  weapon_name[64];  // name of the weapon when selecting it
+   char  weapon_name[128];  // name of the weapon when selecting it
    int type;
    
    float aim_speed; // aim speed, 0.0 worst, 1.0 best.
@@ -141,34 +141,24 @@ enum ammo_low_t {
    AMMO_OK = 3,
 };
 
-// weapon ID values for Valve's Half-Life Deathmatch
+// weapon ID values for the new ZP!
 #define VALVE_WEAPON_CROWBAR       1
-#define VALVE_WEAPON_GLOCK         2
-#define VALVE_WEAPON_PYTHON        3
+#define VALVE_WEAPON_SWIPE         2
+#define VALVE_WEAPON_SIG           3
 #define VALVE_WEAPON_MP5           4
 #define VALVE_WEAPON_CHAINGUN      5
 #define VALVE_WEAPON_CROSSBOW      6
 #define VALVE_WEAPON_SHOTGUN       7
-#define VALVE_WEAPON_RPG           8
-#define VALVE_WEAPON_GAUSS         9
-#define VALVE_WEAPON_EGON         10
+#define VALVE_WEAPON_TNT           8
+#define VALVE_WEAPON_IED           9
+#define VALVE_WEAPON_LEADPIPE     10
 #define VALVE_WEAPON_HORNETGUN    11
 #define VALVE_WEAPON_HANDGRENADE  12
-#define VALVE_WEAPON_TRIPMINE     13
-#define VALVE_WEAPON_SATCHEL      14
-#define VALVE_WEAPON_SNARK        15
-
-// weapon ID values for extra weapons from Gearbox's Opposing Force
-#define GEARBOX_WEAPON_GRAPPLE       16
-#define GEARBOX_WEAPON_EAGLE         17
-#define GEARBOX_WEAPON_PIPEWRENCH    18
-#define GEARBOX_WEAPON_M249          19
-#define GEARBOX_WEAPON_DISPLACER     20
-#define GEARBOX_WEAPON_UNKNOWN21     21
-#define GEARBOX_WEAPON_SHOCKRIFLE    22
-#define GEARBOX_WEAPON_SPORELAUNCHER 23
-#define GEARBOX_WEAPON_SNIPERRIFLE   24
-#define GEARBOX_WEAPON_KNIFE         25
+#define VALVE_WEAPON_DOUBLEBARREL 13
+#define VALVE_WEAPON_PPK          14
+#define VALVE_WEAPON_FAFO         15
+#define VALVE_WEAPON_MOLOTOV      17
+#define VALVE_WEAPON_OLDSWIPE     20
 
 // in normal gravity, how far the longjump hurls us
 #define LONGJUMP_DISTANCE	540
@@ -179,15 +169,17 @@ enum ammo_low_t {
 
 typedef struct
 {
-   char szClassname[64];
+   char szClassname[128];
    int  iAmmo1;     // ammo index for primary ammo
-   int  iAmmo1Max;  // max primary ammo
+   //int  iAmmo1Max;  // max primary ammo
    int  iAmmo2;     // ammo index for secondary ammo
-   int  iAmmo2Max;  // max secondary ammo
+   //int  iAmmo2Max;  // max secondary ammo
    int  iSlot;      // HUD slot (0 based)
-   int  iPosition;  // slot position
+   // int  iPosition;  // slot position
    int  iId;        // weapon ID
    int  iFlags;     // flags???
+   int  iWeight;    // weapon Weight
+   int  bDoubleSlot;// doubel slot weapon
 } bot_weapon_t;
 
 
