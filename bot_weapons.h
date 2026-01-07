@@ -18,16 +18,16 @@
 // waypoint item flags
 #define W_IFL_CROWBAR         (1<<0)
 #define W_IFL_HANDGRENADE     (1<<1)
-#define W_IFL_SNARK           (1<<2)
-#define W_IFL_EGON            (1<<3)
-#define W_IFL_GAUSS           (1<<4)
+#define W_IFL_FAFO            (1<<2)
+#define W_IFL_LEADPIPE        (1<<3)
+#define W_IFL_IED             (1<<4)
 #define W_IFL_SHOTGUN         (1<<5)
-#define W_IFL_PYTHON          (1<<6)
-#define W_IFL_HORNETGUN       (1<<7)
+#define W_IFL_SIG             (1<<6)
+#define W_IFL_DOUBLEBARREL    (1<<7)
 #define W_IFL_MP5             (1<<8)
 #define W_IFL_CROSSBOW        (1<<9)
-#define W_IFL_RPG             (1<<10)
-#define W_IFL_GLOCK           (1<<11)
+#define W_IFL_TNT             (1<<10)
+#define W_IFL_PPK             (1<<11)
 
 #define W_IFL_AMMO_GAUSS      (1<<12)
 #define W_IFL_AMMO_BUCKSHOT   (1<<13)
@@ -38,18 +38,19 @@
 #define W_IFL_AMMO_RPG        (1<<18)
 
 #define W_IFL_GRAPPLE         (1<<19)
-#define W_IFL_EAGLE           (1<<20)
-#define W_IFL_PIPEWRENCH      (1<<21)
-#define W_IFL_M249            (1<<22)
+#define W_IFL_PYTHON          (1<<20)
+#define W_IFL_LEADPIPE        (1<<21)
+#define W_IFL_556AR           (1<<22)
 #define W_IFL_DISPLACER       (1<<23)
 #define W_IFL_SHOCKRIFLE      (1<<24)
 #define W_IFL_SPORELAUNCHER   (1<<25)
 #define W_IFL_SNIPERRIFLE     (1<<26)
-#define W_IFL_KNIFE           (1<<27)
+#define W_IFL_SWIPE           (1<<27)
 
-#define W_IFL_AMMO_556        (1<<28)
+#define W_IFL_AMMO_FAFO       (1<<28)
 #define W_IFL_AMMO_762        (1<<29)
 #define W_IFL_AMMO_SPORE      (1<<30)
+#define W_IFL_AMMO_PPK        (1<<31)
 
 // weapon types
 #define WEAPON_FIRE         (1<<0)
@@ -158,7 +159,7 @@ enum ammo_low_t {
 #define VALVE_WEAPON_PPK          14
 #define VALVE_WEAPON_FAFO         15
 #define VALVE_WEAPON_MOLOTOV      17
-#define VALVE_WEAPON_OLDSWIPE     20
+#define VALVE_WEAPON_PYTHON       18
 
 // in normal gravity, how far the longjump hurls us
 #define LONGJUMP_DISTANCE	540

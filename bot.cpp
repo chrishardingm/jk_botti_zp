@@ -1342,7 +1342,7 @@ static void BotFindItem( bot_t &pBot )
             }
 
             // check if entity is a healthkit...
-            else if (strcmp("item_healthkit", item_name) == 0)
+            else if (strcmp("item_healthkit", item_name) == 0 || strcmp("item_bandage", item_name) == 0 || strcmp("item_painkiller", item_name) == 0)
             {
                // check if the item is not visible (i.e. has not respawned)
                if (pent->v.effects & EF_NODRAW)
