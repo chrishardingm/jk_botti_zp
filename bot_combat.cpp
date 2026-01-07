@@ -1169,7 +1169,7 @@ static qboolean CheckWeaponFireConditions(bot_t & pBot, const bot_weapon_select_
    // Check if bot is on the zombie team.
    // Use Zombie_skill to determine attack perctange.
    int teamEdict = UTIL_GetTeamNum(pEdict);
-   if (RANDOM_LONG2(1, 100) <= zombie_handicap && teamEdict == 1){
+   if (RANDOM_LONG2(1, 100) <= zombie_handicap && teamEdict == 2){
       return FALSE;
    }
    
