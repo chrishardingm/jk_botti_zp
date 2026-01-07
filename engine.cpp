@@ -37,7 +37,10 @@ void (*botMsgFunction)(void *, int) = NULL;
 void (*botMsgEndFunction)(void *, int) = NULL;
 int botMsgIndex;
 
-qboolean g_in_intermission = FALSE;
+qboolean g_in_intermission = TRUE;
+
+static int g_round_state_value = -1;
+static qboolean g_in_round_state_msg = FALSE;
 
 
 typedef struct event_info_s {
@@ -211,7 +214,18 @@ static int FAST_GET_USER_MSG_ID(plid_t plindex, int & value, const char * name, 
 }
 
 static void pfnMessageBegin(int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
-{   
+{
+   // Track RoundState message to unfreeze bots when round starts
+   if (msg_type == GET_USER_MSG_ID(PLID, "RoundState", NULL))
+   {
+      g_round_state_value = -1;  // Reset for new message
+      g_in_round_state_msg = TRUE;
+   }
+   else
+   {
+      g_in_round_state_msg = FALSE;
+   }
+
    if (gpGlobals->deathmatch)
    {
       int index = -1;
@@ -304,6 +318,14 @@ static void pfnMessageBegin(int msg_dest, int msg_type, const float *pOrigin, ed
 
 static void pfnMessageEnd(void)
 {
+   // Process RoundState message completion
+   if (g_round_state_value >= 0)
+   {
+      // RoundState value 4 means round is live; any other value => freeze
+      g_in_intermission = (g_round_state_value != 4);
+      g_round_state_value = -1;
+   }
+
    if (gpGlobals->deathmatch)
    {
       if (botMsgEndFunction)
@@ -346,6 +368,12 @@ static void pfnWriteChar(int iValue)
 
 static void pfnWriteShort(int iValue)
 {
+   // Capture RoundState short value
+   if (g_in_round_state_msg && g_round_state_value == -1)
+   {
+      g_round_state_value = iValue;
+   }
+
    if (gpGlobals->deathmatch)
    {
       // if this message is for a bot, call the client message function...

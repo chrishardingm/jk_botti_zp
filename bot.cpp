@@ -2572,14 +2572,6 @@ void BotThink( bot_t &pBot )
 
    BotUpdateHearingSensitivity(pBot);
 
-   // For some reason Zombie panic needs pfnRunPlayerMove to be ran once before starting a round.
-   if (pBot.not_started)
-   {
-       g_engfuncs.pfnRunPlayerMove(pEdict, pEdict->v.v_angle, pBot.f_move_speed,
-           0, 0, pEdict->v.button, 0, pBot.msecval);
-       pBot.not_started = FALSE;
-       return;
-   }
 
    // does bot need to say a message and time to say a message?
    if (false && (pBot.b_bot_say) && (pBot.f_bot_say < gpGlobals->time))
@@ -2588,11 +2580,27 @@ void BotThink( bot_t &pBot )
 
       UTIL_HostSay(pEdict, 0, pBot.bot_say_msg);
    }
-      
-   // in intermission.. don't do anything, freeze bot
+
+   // Have bot join a team (must happen before round_active freeze)
+   int teamEdict = UTIL_GetTeamNum(pEdict);
+   //Team 0 is before the bot has a team in the new ZP!
+   //Team 4 is before the bot has a team in the old ZP!
+   if(teamEdict == 0 || teamEdict == 4){
+      //Jointeam is the command for the old ZP!
+      //Joingame is the command for the new ZP!
+      if(bot_volunteer_zombie){
+         FakeClientCommand(pEdict, "jointeam", "2", NULL);
+         FakeClientCommand(pEdict, "joingame", "volunteer", NULL);
+      }else {
+         FakeClientCommand(pEdict, "jointeam", "1", NULL);
+         FakeClientCommand(pEdict, "joingame", "", NULL);
+      }
+   }
+
+   // freeze bot until round goes live
    if(g_in_intermission)
    {
-      // endgame chat..
+       // endgame chat..
       if(!pBot.b_bot_endgame)
       {
          pBot.b_bot_endgame = TRUE;
@@ -2627,21 +2635,6 @@ void BotThink( bot_t &pBot )
    // random chatting
    BotChatTalk(pBot);
 
-   // Have bot join a team
-   int teamEdict = UTIL_GetTeamNum(pEdict);
-   //Team 0 is before the bot has a team in the new ZP!
-   //Team 4 is before the bot has a team in the old ZP!
-   if(teamEdict == 0 || teamEdict == 4){
-      //Jointeam is the command for the old ZP!
-      //Joingame is the command for the new ZP!
-      if(bot_volunteer_zombie){
-         FakeClientCommand(pEdict, "jointeam", "2", NULL);
-         FakeClientCommand(pEdict, "joingame", "volunteer", NULL);
-      }else {
-         FakeClientCommand(pEdict, "jointeam", "1", NULL);
-         FakeClientCommand(pEdict, "joingame", "", NULL);
-      }
-   }
    // set this for the next time the bot dies so it will initialize stuff
    if (pBot.need_to_initialize == FALSE)
    {

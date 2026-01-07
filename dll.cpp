@@ -228,7 +228,7 @@ static int Spawn( edict_t *pent )
 
          m_spriteTexture = PRECACHE_MODEL( "sprites/lgtning.spr");
 
-         g_in_intermission = FALSE;
+         g_in_intermission = TRUE;
 
          is_team_play = FALSE;
          checked_teamplay = FALSE;
