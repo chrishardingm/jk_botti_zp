@@ -2581,25 +2581,19 @@ void BotThink( bot_t &pBot )
       UTIL_HostSay(pEdict, 0, pBot.bot_say_msg);
    }
 
-   // Have bot join a team (must happen before round_active freeze)
-   int teamEdict = UTIL_GetTeamNum(pEdict);
-   //Team 0 is before the bot has a team in the new ZP!
-   //Team 4 is before the bot has a team in the old ZP!
-   if(teamEdict == 0 || teamEdict == 4){
-      //Jointeam is the command for the old ZP!
-      //Joingame is the command for the new ZP!
-      if(bot_volunteer_zombie){
-         FakeClientCommand(pEdict, "jointeam", "2", NULL);
-         FakeClientCommand(pEdict, "joingame", "volunteer", NULL);
-      }else {
-         FakeClientCommand(pEdict, "jointeam", "1", NULL);
-         FakeClientCommand(pEdict, "joingame", "", NULL);
-      }
-   }
 
    // freeze bot until round goes live
    if(g_in_intermission)
    {
+      // Have bot join a team if not already on one.
+      int teamEdict = UTIL_GetTeamNum(pEdict);
+      if(teamEdict == 0){
+         if(bot_volunteer_zombie){
+            FakeClientCommand(pEdict, "joingame", "volunteer", NULL);
+         }else {
+            FakeClientCommand(pEdict, "joingame", "", NULL);
+         }
+      }
        // endgame chat..
       if(!pBot.b_bot_endgame)
       {
