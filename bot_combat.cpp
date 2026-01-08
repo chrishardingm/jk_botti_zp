@@ -1166,6 +1166,13 @@ static qboolean CheckWeaponFireConditions(bot_t & pBot, const bot_weapon_select_
 {
    edict_t *pEdict = pBot.pEdict;
    
+   // Check if clip is empty and reload if needed
+   if (pBot.current_weapon.iClip == 0 && pBot.current_weapon.iAmmo1 > 0)
+   {
+      pEdict->v.button |= IN_RELOAD;
+      return FALSE;  // Can't fire while reloading
+   }
+   
    // Check if bot is on the zombie team.
    // Use Zombie_skill to determine attack perctange.
    int teamEdict = UTIL_GetTeamNum(pEdict);
