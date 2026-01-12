@@ -2516,22 +2516,10 @@ qboolean BotPickupItem(bot_t& pBot) {
             return FALSE;
         }
         
-        // In optimal range - press USE
-        if (pBot.f_pickup_attempt_time == 0.0)
-        {
-            pBot.f_pickup_attempt_time = gpGlobals->time;
-        }
-        
-        // Keep pressing USE for up to 1.5 seconds
-        if (gpGlobals->time - pBot.f_pickup_attempt_time < 1.5)
-        {
-            pBot.pEdict->v.button |= IN_USE;
-        }
-        else
-        {
-            // Timeout on individual USE attempt - reset and try again
-            pBot.f_pickup_attempt_time = 0.0;
-        }
+        // Spam USE button every frame for instant pickup
+        pBot.pEdict->v.button |= IN_USE;
+        // Slow down movement while using to improve stability
+        pBot.f_move_speed *= 0.3;
     }
     else if (item_distance < 40) {
         // Too close - back away aggressively
