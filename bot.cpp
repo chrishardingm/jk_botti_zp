@@ -48,6 +48,7 @@ extern qboolean g_in_intermission;
 
 extern bot_chat_t bot_chat[MAX_BOT_CHAT];
 extern bot_chat_t bot_whine[MAX_BOT_CHAT];
+extern bot_weapon_t weapon_defs[MAX_WEAPONS];
 extern int bot_chat_count;
 extern int bot_whine_count;
 extern int recent_bot_chat[];
@@ -95,6 +96,54 @@ void BotKick(bot_t &pBot)
    
    SERVER_COMMAND(cmd);  // kick the bot using 'kick # <userid>'
    SERVER_EXECUTE();
+}
+
+
+// Recalculate inventory slots and weight based on current weapons
+void BotUpdateInventory(bot_t& pBot)
+{
+   pBot.inventory_slots = 0;
+   pBot.total_weight = 0;
+   int weapon_count = 0;
+   int slots_used = 0;
+   
+   for (int i = 0; i < 32; i++)
+   {
+      if (pBot.pEdict->v.weapons & (1 << i))
+      {
+         weapon_count++;
+         int iSlot = weapon_defs[i].iSlot;
+         int iWeight = weapon_defs[i].iWeight;
+         
+         // Calculate slot usage: 1 slot for normal weapons, 2 slots for bDoubleSlot weapons
+         if (weapon_defs[i].bDoubleSlot)
+            slots_used += 2;
+         else
+            slots_used += 1;
+         
+         // Add weight regardless of slot validity
+         pBot.total_weight += iWeight;
+         
+         if (iSlot >= 0 && iSlot < 10)
+         {
+            pBot.inventory_slots |= (1 << iSlot);
+            // If double slot weapon, also mark next slot
+            if (weapon_defs[i].bDoubleSlot && iSlot < 9)
+            {
+               pBot.inventory_slots |= (1 << (iSlot + 1));
+            }
+         }
+      }
+   }
+   
+   // Store the actual slots used (not weapon count)
+   pBot.slots_used = slots_used;
+}
+
+// Calculate how many slots a weapon uses (1 or 2)
+int GetWeaponSlotCount(int weapon_id)
+{
+   return weapon_defs[weapon_id].bDoubleSlot ? 2 : 1;
 }
 
 
@@ -146,6 +195,40 @@ static void BotSpawnInit( bot_t &pBot )
    pBot.f_prev_speed = 0.0;  // fake "paused" since bot is NOT stuck
    pBot.f_find_item = 0.0;
    pBot.b_not_maxspeed = FALSE;
+
+   pBot.f_pickup_attempt_time = 0.0;
+   pBot.f_pickup_give_up_time = 0.0;
+   
+   // Count initial weapons and calculate slot usage
+   pBot.inventory_slots = 0;
+   pBot.slots_used = 0;
+   pBot.total_weight = 0;
+   for (int i = 0; i < 32; i++)
+   {
+      if (pBot.pEdict->v.weapons & (1 << i))
+      {
+         // Calculate slot usage: 1 or 2 slots per weapon
+         if (weapon_defs[i].bDoubleSlot)
+            pBot.slots_used += 2;
+         else
+            pBot.slots_used += 1;
+         
+         // Add weight regardless of slot
+         pBot.total_weight += weapon_defs[i].iWeight;
+         
+         // Mark slots as occupied
+         int iSlot = weapon_defs[i].iSlot;
+         if (iSlot >= 0 && iSlot < 10)
+         {
+            pBot.inventory_slots |= (1 << iSlot);
+            // If double slot weapon, also mark next slot
+            if (weapon_defs[i].bDoubleSlot && iSlot < 9)
+            {
+               pBot.inventory_slots |= (1 << (iSlot + 1));
+            }
+         }
+      }
+   }
 
    pBot.ladder_dir = LADDER_UNKNOWN;
    pBot.f_start_use_ladder_time = 0.0;
@@ -1263,8 +1346,31 @@ static void BotFindItem( bot_t &pBot )
                   //does player have this weapon
                   if(pEdict->v.weapons & (1<<pSelect[select_index].iId))
                   {
-                     // is ammo low?
-                     if(BotPrimaryAmmoLow(pBot, pSelect[select_index]) == AMMO_LOW)
+                     // Already have this weapon, don't pick it up
+                     can_pickup = FALSE;
+                  }
+                  else
+                  {
+                     // Don't have this weapon - check if we have inventory space
+                     int weapon_slot = weapon_defs[pSelect[select_index].iId].iSlot;
+                     int weapon_weight = weapon_defs[pSelect[select_index].iId].iWeight;
+                     int slots_needed = weapon_defs[pSelect[select_index].iId].bDoubleSlot ? 2 : 1;
+                     
+                     qboolean slot_available = TRUE;
+                     
+                     // Check slot availability (max 5 slots total)
+                     if (pBot.slots_used + slots_needed > 5)
+                     {
+                        slot_available = FALSE;
+                     }
+                     
+                     // Check weight limit (max 50)
+                     else if (pBot.total_weight + weapon_weight > 50)
+                     {
+                        slot_available = FALSE;
+                     }
+                     
+                     if (slot_available)
                      {
                         can_pickup = TRUE;
                      }
@@ -1272,6 +1378,7 @@ static void BotFindItem( bot_t &pBot )
                }
                else
                {
+                  // Unknown weapon, pick it up
                   can_pickup = TRUE;
                }
             }
@@ -1285,28 +1392,40 @@ static void BotFindItem( bot_t &pBot )
                   continue;
                }
                
-               // check if player is running out of this ammo on any weapon
+               // check if player has a weapon that uses this ammo
                select_index = -1;
                while(pSelect[++select_index].iId)
                {
-                  if(itemflag & pSelect[select_index].ammo1_waypoint_flag)
+                  // Check if bot has a weapon that uses this ammo type
+                  if((pEdict->v.weapons & (1<<pSelect[select_index].iId)) != 0)
                   {
-                     if(BotPrimaryAmmoLow(pBot, pSelect[select_index]) == AMMO_LOW)
-                        can_pickup = TRUE;
-                     else if(BotSecondaryAmmoLow(pBot, pSelect[select_index]) == AMMO_LOW)
-                        can_pickup = TRUE;
-                  }
-                  else if(itemflag & pSelect[select_index].ammo2_waypoint_flag)
-                  {
-                     if(BotPrimaryAmmoLow(pBot, pSelect[select_index]) == AMMO_LOW)
-                        can_pickup = TRUE;
-                     else if(BotSecondaryAmmoLow(pBot, pSelect[select_index]) == AMMO_LOW)
-                        can_pickup = TRUE;
-                  }
-                  
-                  if(can_pickup)
-                  {
-                     break;
+                     // Bot has this weapon, check if it uses this ammo
+                     if(itemflag & pSelect[select_index].ammo1_waypoint_flag)
+                     {
+                        // Check if we have space for this ammo (assume 1 slot, weight from weapon def)
+                        int ammo_weight = weapon_defs[pSelect[select_index].iId].iWeight;
+                        int slots_needed = weapon_defs[pSelect[select_index].iId].bDoubleSlot ? 2 : 1;
+                        
+                        // Allow pickup only if within limits
+                        if (pBot.slots_used + slots_needed <= 5 && pBot.total_weight + ammo_weight <= 50)
+                        {
+                           can_pickup = TRUE;
+                        }
+                        break;
+                     }
+                     else if(itemflag & pSelect[select_index].ammo2_waypoint_flag)
+                     {
+                        // Check if we have space for this ammo (assume 1 slot, weight from weapon def)
+                        int ammo_weight = weapon_defs[pSelect[select_index].iId].iWeight;
+                        int slots_needed = weapon_defs[pSelect[select_index].iId].bDoubleSlot ? 2 : 1;
+                        
+                        // Allow pickup only if within limits
+                        if (pBot.slots_used + slots_needed <= 5 && pBot.total_weight + ammo_weight <= 50)
+                        {
+                           can_pickup = TRUE;
+                        }
+                        break;
+                     }
                   }
                }
             }
@@ -1358,7 +1477,23 @@ static void BotFindItem( bot_t &pBot )
             // check if entity is a packed up weapons box...
             else if (strcmp("weaponbox", item_name) == 0)
             {
-               can_pickup = TRUE;
+               // Only pick up if we have at least one free slot and weight capacity
+               // Check if any slot 0-9 is free
+               qboolean has_space = FALSE;
+               for (int slot = 0; slot < 10; slot++)
+               {
+                  if (!(pBot.inventory_slots & (1 << slot)))
+                  {
+                     has_space = TRUE;
+                     break;
+                  }
+               }
+               
+               // Also need weight capacity (assume weaponbox contains ~100-200 weight)
+               if (has_space && pBot.total_weight < 2300)
+               {
+                  can_pickup = TRUE;
+               }
             }
 
             // check if entity is the spot from RPG laser
@@ -1730,7 +1865,41 @@ static void BotJustWanderAround(bot_t &pBot, float moved_distance)
    // check if bot should look for items now or not...
    if (pBot.f_find_item <= gpGlobals->time)
    {
-      BotFindItem( pBot );  // see if there are any visible items
+      // Clear target if inventory is full (prevents picking up items after slot limit reached)
+      // Use safety margin (45 instead of 50) to account for heavy weapons
+      if (pBot.slots_used >= 5 || pBot.total_weight > 45)
+      {
+         if (!FNullEnt(pBot.pBotPickupItem))
+         {
+            pBot.pBotPickupItem = NULL;
+            pBot.f_pickup_attempt_time = 0.0;
+            pBot.f_pickup_give_up_time = 0.0;
+         }
+      }
+      else
+      {
+         BotFindItem( pBot );  // see if there are any visible items
+      }
+   }
+
+   // try to pick up item if one is targeted
+   if (!FNullEnt(pBot.pBotPickupItem))
+   {
+      // Initialize give up timer on first attempt
+      if (pBot.f_pickup_give_up_time == 0.0)
+         pBot.f_pickup_give_up_time = gpGlobals->time + 5.0;
+      
+      // Give up on item after 5 seconds of trying
+      if (gpGlobals->time > pBot.f_pickup_give_up_time)
+      {
+         pBot.pBotPickupItem = NULL;
+         pBot.f_pickup_attempt_time = 0.0;
+         pBot.f_pickup_give_up_time = 0.0;
+      }
+      else if (BotPickupItem(pBot))
+      {
+         return;
+      }
    }
 
    // check if bot sees a tripmine...
@@ -2571,6 +2740,9 @@ void BotThink( bot_t &pBot )
    pBot.b_low_health = BotLowHealth(pBot);
 
    BotUpdateHearingSensitivity(pBot);
+   
+   // Update inventory slots and weight based on current weapons
+   BotUpdateInventory(pBot);
 
 
    // does bot need to say a message and time to say a message?

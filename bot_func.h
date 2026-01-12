@@ -65,6 +65,14 @@ qboolean BotCheckWallOnRight( bot_t &pBot );
 qboolean BotCheckWallOnBack( bot_t &pBot );
 qboolean BotCheckWallOnForward( bot_t &pBot );
 void BotLookForDrop( bot_t &pBot );
+qboolean BotPickupItem(bot_t& pBot);
+
+// Recalculate inventory slots and weight based on current weapons
+void BotUpdateInventory(bot_t& pBot);
+
+// Calculate how many slots a weapon uses (1 or 2)
+int GetWeaponSlotCount(int weapon_id);
+
 qboolean BotDefuseC4( bot_t& pBot );
 
 // commands.cpp:

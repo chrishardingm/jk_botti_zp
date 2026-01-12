@@ -203,6 +203,11 @@ typedef struct
 
    float f_find_item;
    edict_t *pBotPickupItem;
+   float f_pickup_attempt_time;  // time when pickup attempt started (for frame holding)
+   float f_pickup_give_up_time;  // time to give up on this item completely
+   int inventory_slots;       // bitmap of occupied HUD slots (0-9)
+   int slots_used;            // number of inventory slots used (max 5)
+   int total_weight;          // total weight of items carried (max 2500)
 
    int ladder_dir;
    float f_start_use_ladder_time;

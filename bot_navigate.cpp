@@ -2471,6 +2471,82 @@ void BotLookForDrop( bot_t &pBot )
    }
 }
 
+qboolean BotPickupItem(bot_t& pBot) {
+    edict_t* pItem = pBot.pBotPickupItem;
+    
+    if (FNullEnt(pItem))
+        return FALSE;
+    
+    // Check if inventory is full - abort pickup attempt
+    // Use safety margin to account for heavy weapons
+    if (pBot.slots_used >= 5 || pBot.total_weight > 45)
+    {
+        pBot.pBotPickupItem = NULL;
+        pBot.f_pickup_attempt_time = 0.0;
+        pBot.f_pickup_give_up_time = 0.0;
+        return FALSE;
+    }
+    
+    Vector item_origin = pItem->v.origin;
+    if (!BotEntityIsVisible(pBot, item_origin))
+        return FALSE;
+    
+    Vector aim_origin = GetGunPosition(pBot.pEdict);
+    Vector aim_dir = item_origin - aim_origin;
+    Vector target_angle = UTIL_VecToAngles(aim_dir);
+    
+    pBot.pEdict->v.idealpitch = -UTIL_WrapAngle(target_angle.x);
+    pBot.pEdict->v.ideal_yaw = UTIL_WrapAngle(target_angle.y);
+    
+    float item_distance = aim_dir.Length();
+    
+    // If item is too far away (>150 units), return FALSE so bot can navigate normally
+    if (item_distance > 150.0)
+        return FALSE;
+    
+    // Try to use at optimal distance (40-120 units)
+    if (item_distance >= 40 && item_distance < 120) {
+        // Check inventory limits RIGHT BEFORE pressing USE
+        // Use safety margin (45 instead of 50) to account for heavy weapons
+        if (pBot.slots_used >= 5 || pBot.total_weight > 45)
+        {
+            pBot.pBotPickupItem = NULL;
+            pBot.f_pickup_attempt_time = 0.0;
+            pBot.f_pickup_give_up_time = 0.0;
+            return FALSE;
+        }
+        
+        // In optimal range - press USE
+        if (pBot.f_pickup_attempt_time == 0.0)
+        {
+            pBot.f_pickup_attempt_time = gpGlobals->time;
+        }
+        
+        // Keep pressing USE for up to 1.5 seconds
+        if (gpGlobals->time - pBot.f_pickup_attempt_time < 1.5)
+        {
+            pBot.pEdict->v.button |= IN_USE;
+        }
+        else
+        {
+            // Timeout on individual USE attempt - reset and try again
+            pBot.f_pickup_attempt_time = 0.0;
+        }
+    }
+    else if (item_distance < 40) {
+        // Too close - back away aggressively
+        pBot.pEdict->v.button |= IN_BACK;
+        pBot.pEdict->v.button &= ~IN_FORWARD;
+        pBot.f_move_speed = -pBot.f_max_speed;
+        pBot.f_pickup_attempt_time = 0.0;
+    }
+    else {
+        // 120-150 units: approaching, reset USE timer
+        pBot.f_pickup_attempt_time = 0.0;
+    }
+    return TRUE;
+}
+
 qboolean BotDefuseC4(bot_t& pBot) {
     char team[16];
     UTIL_GetTeam(pBot.pEdict, team, 16);

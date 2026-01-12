@@ -89,6 +89,18 @@ void BotClient_Valve_WeaponList(void* p, int bot_index)
     case 7:
         bot_weapon.bDoubleSlot = *(byte*)p;
         weapon_defs[bot_weapon.iId] = bot_weapon;
+        
+        // Initialize weapon ID 19 (zombie hands/claws) since engine doesn't send it
+        static qboolean initialized_weapon_19 = FALSE;
+        if (!initialized_weapon_19)
+        {
+            initialized_weapon_19 = TRUE;
+            safe_strcopy(weapon_defs[19].szClassname, sizeof(weapon_defs[19].szClassname), "weapon_zombie_hands");
+            weapon_defs[19].iSlot = 0;
+            weapon_defs[19].iWeight = 21;
+            weapon_defs[19].bDoubleSlot = 0;
+            weapon_defs[19].iId = 19;
+        }
 
         state = 0;
         break;

@@ -63,18 +63,6 @@ bot_weapon_select_t valve_weapon_select[NUM_OF_WEAPON_SELECTS] =
     55, FALSE, 70, 1, 2, TRUE, FALSE, FALSE, FALSE, 0.0, 0.0, TRUE, 12, 12,
     W_IFL_SHOTGUN, W_IFL_AMMO_BUCKSHOT, 0, TRUE, FALSE },   
 
-   {VALVE_WEAPON_SIG, WEAPON_SUBMOD_ALL, "weapon_sig", WEAPON_FIRE, 1.0,
-    SKILL5, SKILL3, FALSE, TRUE,
-    0.0, 1000.0, 32.0, 300.0, 300.0,
-    20, TRUE, 70, 1, 1, TRUE, TRUE, FALSE, FALSE, 0.0, 0.0, TRUE, 30, -1,
-    W_IFL_SIG, W_IFL_AMMO_9MM, 0, TRUE, FALSE },
-
-   {VALVE_WEAPON_PPK, WEAPON_SUBMOD_ALL, "weapon_ppk", WEAPON_FIRE, 1.0,
-    SKILL5, SKILL3, FALSE, TRUE,
-    0.0, 1500.0, 32.0, 300.0, 300.0,
-    20, TRUE, 70, 1, 1, TRUE, TRUE, FALSE, FALSE, 0.0, 0.0, TRUE, 30, -1,
-    W_IFL_PPK, W_IFL_AMMO_9MM, 0, TRUE, FALSE },
-
    {VALVE_WEAPON_PYTHON, WEAPON_SUBMOD_ALL, "weapon_python", WEAPON_FIRE, 1.0,
     SKILL4, SKILL2, FALSE, TRUE,
     0.0, 1500.0, 32.0, 300.0, 300.0,
@@ -104,6 +92,18 @@ bot_weapon_select_t valve_weapon_select[NUM_OF_WEAPON_SELECTS] =
     300.0, 800.0, 0.0, 0.0, 300.0,
     20, TRUE, 100, 1, 0, FALSE, FALSE, FALSE, FALSE, 0.0, 0.0, TRUE, -1, -1,
     W_IFL_TNT, 0, 0, TRUE, FALSE },
+
+   {VALVE_WEAPON_SIG, WEAPON_SUBMOD_ALL, "weapon_sig", WEAPON_FIRE, 1.0,
+    SKILL5, SKILL3, FALSE, TRUE,
+    0.0, 1000.0, 32.0, 300.0, 300.0,
+    20, TRUE, 70, 1, 1, TRUE, TRUE, FALSE, FALSE, 0.0, 0.0, TRUE, 30, -1,
+    W_IFL_SIG, W_IFL_AMMO_9MM, 0, TRUE, FALSE },
+
+   {VALVE_WEAPON_PPK, WEAPON_SUBMOD_ALL, "weapon_ppk", WEAPON_FIRE, 1.0,
+    SKILL5, SKILL3, FALSE, TRUE,
+    0.0, 1500.0, 32.0, 300.0, 300.0,
+    20, TRUE, 70, 1, 1, TRUE, TRUE, FALSE, FALSE, 0.0, 0.0, TRUE, 30, -1,
+    W_IFL_PPK, W_IFL_AMMO_9MM, 0, TRUE, FALSE },
 
    {VALVE_WEAPON_LEADPIPE, WEAPON_SUBMOD_ALL, "weapon_leadpipe", WEAPON_MELEE, 1.0,
     NOSKILL, NOSKILL, FALSE, FALSE,
@@ -186,14 +186,6 @@ bot_fire_delay_t valve_fire_delay[NUM_OF_WEAPON_SELECTS] = {
     0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
     0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
 
-   {VALVE_WEAPON_SIG,
-    0.8, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
-    0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
-
-   {VALVE_WEAPON_PPK,
-    0.4, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
-    0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
-
    {VALVE_WEAPON_PYTHON,
     0.5, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
     0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
@@ -212,6 +204,14 @@ bot_fire_delay_t valve_fire_delay[NUM_OF_WEAPON_SELECTS] = {
 
    {VALVE_WEAPON_MOLOTOV,
     1.5, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
+    0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
+   
+   {VALVE_WEAPON_SIG,
+    0.8, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
+    0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
+
+   {VALVE_WEAPON_PPK,
+    0.4, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0},
     0.0, {0.0, 0.0, 0.0, 0.0, 0.0}, {0.0, 0.0, 0.0, 0.0, 0.0}},
 
    {VALVE_WEAPON_LEADPIPE,
